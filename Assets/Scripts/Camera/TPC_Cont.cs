@@ -7,7 +7,7 @@ public class TPC_Cont : MonoBehaviour {
     private float HorizontalSensitivity = 2f;
 
     private bool InvertXAxis = false;
-    private bool InvertYAxis = false;
+    private bool InvertYAxis = true;
 
     [SerializeField] private Camera PlayerCamera;
     [SerializeField] private Rigidbody Player;

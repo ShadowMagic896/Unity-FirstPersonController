@@ -150,7 +150,7 @@ public class MovementController : MonoBehaviour
     {
 
         // These test if a sphere placed where the test spheres are touch anything other than the Player (ground, wall, etc)
-        IsGrounded = Physics.OverlapSphere(GroundCheckTransform.position, 0.75f).Length > 1;
+        IsGrounded = Physics.OverlapSphere(GroundCheckTransform.position, 0.25f).Length > 1;
 
         /*
         Unused ATM
