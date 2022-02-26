@@ -43,6 +43,9 @@ public class MovementController : MonoBehaviour
     private bool HVaultPossible;
     private bool BadVaultPossible;
 
+    private bool Restarting;
+    private bool DebugActive;
+
     public static int DisplayControlScheme = 2; // 1 is First Person, 2 is Third Person
 
 
@@ -130,6 +133,14 @@ public class MovementController : MonoBehaviour
             IsCrouching = false;
         }
 
+        if (Input.GetKey(KeyCode.R)) {
+            Restarting = true;
+        }
+        if (Input.GetKey(KeyCode.F)) {
+            DebugActive = true;
+        } else {
+            DebugActive = false;
+        }
         HorizontalInput = transform.right * Input.GetAxis("Horizontal") * MovementSpeed + transform.forward * Input.GetAxis("Vertical") * MovementSpeed;
 
 
@@ -214,7 +225,14 @@ public class MovementController : MonoBehaviour
         bool[] BooleanValues = {IsCrouching, IsWalking, IsSprinting};
         string[] StringValues = {"Crouching", "Walking", "Sprinting"};
 
-        LogInfo(BooleanValues, StringValues);
+        if (DebugActive) {
+            LogInfo(BooleanValues, StringValues);
+        }
+
+        if (Restarting) {
+            Restarting = false;
+            Player.position = Vector3.zero;
+        }
     }
 }
 

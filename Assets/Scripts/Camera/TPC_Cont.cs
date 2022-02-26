@@ -6,6 +6,9 @@ public class TPC_Cont : MonoBehaviour {
     private float VerticalSensitivity = 2f;
     private float HorizontalSensitivity = 2f;
 
+    private bool InvertXAxis = false;
+    private bool InvertYAxis = false;
+
     [SerializeField] private Camera PlayerCamera;
     [SerializeField] private Rigidbody Player;
 
@@ -18,6 +21,13 @@ public class TPC_Cont : MonoBehaviour {
         if (MovementController.DisplayControlScheme == 2) {
             float XIn = Input.GetAxis("Mouse X");
             float YIn = Input.GetAxis("Mouse Y");
+
+            if (InvertXAxis) {
+                XIn *= -1;
+            }
+            if (InvertYAxis) {
+                YIn *= -1;
+            }
 
             if (Input.GetKey(KeyCode.Mouse1)) {
                 PlayerCamera.transform.RotateAround(
