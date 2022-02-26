@@ -43,6 +43,8 @@ public class MovementController : MonoBehaviour
     private bool HVaultPossible;
     private bool BadVaultPossible;
 
+    public static int DisplayControlScheme = 2; // 1 is First Person, 2 is Third Person
+
 
     [SerializeField] private Transform GroundCheckTransform;
     // [SerializeField] private Transform HigherVaultTransform;
