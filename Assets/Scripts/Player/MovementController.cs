@@ -6,20 +6,8 @@ using UnityEngine;
 
 public class MovementController : MonoBehaviour
 {
-    public static float Abs(float x){
-        if (x < 0){
-            return -x;
-        } return x;
-    }
-    private string StrTimesInt(string str, int times) {
-        string end = "";
-        for (int i = 0; i < times; i++) {
-            end += str;
-        }
-        return end;
-    }
-
     private Rigidbody Player;
+    private Camera Camera;
 
     private bool IsJumping;
     private float JumpForce = 7f;
@@ -32,18 +20,19 @@ public class MovementController : MonoBehaviour
 
     // These are multiplicitive with the base movement speed, so crouching reduces speed by 50%, and sprinting
     // increases speed by twofold. This makes it easier to, say, walk or sprint while crouching
-    private bool IsCrouching;
+    public bool IsCrouching;
     private float CrouchMultiplier = 0.5f;
 
-    private bool IsWalking;
+    public bool IsWalking;
     private float WalkMultiplier = 0.75f;
     
-    private bool IsSprinting;
+    public bool IsSprinting;
     private float SprintMultiplier = 2f;
 
     private Vector3 HorizontalInput;
     private float MovementSpeed = 5f; // Default speed
 
+    private bool ToggleCrouching = false; // Whether to toggle or hold keys for crouching
     private bool ToggleWalk = false; // Whether to toggle or hold keys for walking
     private bool ToggleSprint = false; // Whether to toggle or hold keys for sprinting
     private bool OverrideControls = true; // Whether keys can override other ones or not (walking / running)
@@ -59,6 +48,37 @@ public class MovementController : MonoBehaviour
     // [SerializeField] private Transform HigherVaultTransform;
     // [SerializeField] private Transform LowerVaultTransform;
     // [SerializeField] private Transform BadVaultTransform;
+
+    public static float Abs(float x){
+        if (x < 0){
+            return -x;
+        } return x;
+    }
+    private string StrTimesInt(string str, int times) {
+        string end = "";
+        for (int i = 0; i < times; i++) {
+            end += str;
+        }
+        return end;
+    }
+    // Accesses variables like toggle walk / sprint and returns a boolean val that follows that logic
+    // i.e. if the setting is toggle, this will toggle the input.
+    private bool InputCheck(string key, bool input) {
+        if (){
+            IsWalking = false;
+            IsSprinting = !IsSprinting;
+        }
+
+        if (){
+            IsSprinting = false;
+            IsWalking = !IsWalking;
+        }
+
+        if (){
+            IsSprinting = false;
+            
+    }
+
 
     void Start()
     {
@@ -76,8 +96,9 @@ public class MovementController : MonoBehaviour
         IsForward = Input.GetKey(KeyCode.W);
         
         if (Input.GetKeyDown(KeyCode.LeftShift) && (OverrideControls || !IsWalking)){
-            IsWalking = false;
-            IsSprinting = !IsSprinting;
+            IsSprinting = InputCheck(
+                
+            )
         }
 
         if (Input.GetKeyDown(KeyCode.LeftAlt) && (OverrideControls || !IsSprinting)){
@@ -161,6 +182,7 @@ public class MovementController : MonoBehaviour
         // Note: Walking and sprinting cannot happen simultaneously
 
         if (IsCrouching) {
+            // Slow down player
             totalSpeed *= CrouchMultiplier;
         }
 

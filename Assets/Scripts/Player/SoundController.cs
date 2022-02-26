@@ -19,10 +19,8 @@ public class SoundController : MonoBehaviour {
     void Update() {
         if (Abs(player.velocity.x) > 1 || Abs(player.velocity.z) > 1){
             audioSource.Play();
-            Debug.Log("Playing");
         } else {
             audioSource.Stop();
-            Debug.Log("Stopped playing");
         }
     }
 
