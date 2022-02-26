@@ -32,7 +32,7 @@ public class MovementController : MonoBehaviour
     private Vector3 HorizontalInput;
     private float MovementSpeed = 5f; // Default speed
 
-    private bool ToggleCrouching = false; // Whether to toggle or hold keys for crouching
+    private bool ToggleCrouch = false; // Whether to toggle or hold keys for crouching
     private bool ToggleWalk = false; // Whether to toggle or hold keys for walking
     private bool ToggleSprint = false; // Whether to toggle or hold keys for sprinting
     private bool OverrideControls = true; // Whether keys can override other ones or not (walking / running)
@@ -61,22 +61,12 @@ public class MovementController : MonoBehaviour
         }
         return end;
     }
-    // Accesses variables like toggle walk / sprint and returns a boolean val that follows that logic
-    // i.e. if the setting is toggle, this will toggle the input.
-    private bool InputCheck(string key, bool input) {
-        if (){
-            IsWalking = false;
-            IsSprinting = !IsSprinting;
+    private void LogInfo(bool[] items, string[] names) {
+        string end = "";
+        for (int i = 0; i < items.Length; i++) {
+            end += (items[i] ? names[i] : "Not-" + names[i]) + ", ";
         }
-
-        if (){
-            IsSprinting = false;
-            IsWalking = !IsWalking;
-        }
-
-        if (){
-            IsSprinting = false;
-            
+        Debug.Log(end);
     }
 
 
@@ -95,20 +85,47 @@ public class MovementController : MonoBehaviour
         }
         IsForward = Input.GetKey(KeyCode.W);
         
-        if (Input.GetKeyDown(KeyCode.LeftShift) && (OverrideControls || !IsWalking)){
-            IsSprinting = InputCheck(
-                
-            )
+        // Key is pressed, and either we are not walking or we override the walking
+
+        // Seperate actions for whether toggle or hold.
+
+        // If it's toggle, we turn off walking and toggle the sprinting.
+
+        // If it isn't toggle, then we turn it on when the key is pressed, and then add the 
+        // extra clause at the bottom to turn it off when the key is not being pressed
+
+        if (Input.GetKey(KeyCode.LeftShift) && (!IsWalking || OverrideControls)){
+            if (ToggleSprint) {
+                IsWalking = false;
+                IsSprinting = !IsSprinting;
+            } else if ((ToggleSprint) && (!IsWalking || OverrideControls)){
+                IsWalking = false;
+                IsSprinting = true;
+            }
+        } else if ((!Input.GetKey(KeyCode.LeftShift) && !ToggleSprint) && (!IsWalking || OverrideControls)) {
+            IsSprinting = false;
         }
 
-        if (Input.GetKeyDown(KeyCode.LeftAlt) && (OverrideControls || !IsSprinting)){
-            IsSprinting = false;
-            IsWalking = !IsWalking;
+        if (Input.GetKey(KeyCode.LeftAlt) && (!IsWalking || OverrideControls)){
+            if (ToggleWalk) {
+                IsSprinting = false;
+                IsWalking = !IsWalking;
+            } else if (!ToggleWalk && (!IsSprinting || OverrideControls)) {
+                IsSprinting = false;
+                IsWalking = true;
+            }
+        } else if ((!Input.GetKey(KeyCode.LeftAlt)) {
+            IsWalking = false;
         }
 
-        if (Input.GetKeyDown(KeyCode.LeftControl) && (OverrideControls || !IsSprinting)){
-            IsSprinting = false;
-            IsWalking = !IsWalking;
+        if (Input.GetKey(KeyCode.LeftControl)){
+            if (ToggleCrouch) {
+                IsCrouching = !IsCrouching;
+            } else {
+                IsCrouching = true;
+            }
+        } else if ((!Input.GetKey(KeyCode.LeftControl) && !ToggleCrouch)) {
+            IsCrouching = false;
         }
 
         HorizontalInput = transform.right * Input.GetAxis("Horizontal") * MovementSpeed + transform.forward * Input.GetAxis("Vertical") * MovementSpeed;
@@ -122,10 +139,13 @@ public class MovementController : MonoBehaviour
         // These test if a sphere placed where the test spheres are touch anything other than the Player (ground, wall, etc)
         IsGrounded = Physics.OverlapSphere(GroundCheckTransform.position, 0.75f).Length > 1;
 
-        // LVaultPossible = Physics.OverlapSphere(LowerVaultTransform.position, 0.5f).Length > 1;
-        // HVaultPossible = Physics.OverlapSphere(HigherVaultTransform.position, 0.5f).Length > 1;
-        // BadVaultPossible = Physics.OverlapSphere(BadVaultTransform.position, 1f).Length > 1;
+        /*
+        Unused ATM
 
+        LVaultPossible = Physics.OverlapSphere(LowerVaultTransform.position, 0.5f).Length > 1;
+        HVaultPossible = Physics.OverlapSphere(HigherVaultTransform.position, 0.5f).Length > 1;
+        BadVaultPossible = Physics.OverlapSphere(BadVaultTransform.position, 1f).Length > 1;
+        */
 
 
         if (IsJumping) {
@@ -153,26 +173,28 @@ public class MovementController : MonoBehaviour
                 );
             }
         }
-        // if (!BadVaultPossible && Input.GetKeyDown(KeyCode.W)){
-        //     if (HVaultPossible){
-        //         Player.AddForce(
-        //             Vector3.up * 500f,
-        //             ForceMode.Impulse
-        //         );
-        //     } else if (LVaultPossible) {
-        //         Player.AddForce(
-        //             Vector3.up * 1.25f,
-        //             ForceMode.Impulse
-        //         );
-        //     }
-        // }
+        /*
+        if (!BadVaultPossible && Input.GetKeyDown(KeyCode.W)){
+            if (HVaultPossible){
+                Player.AddForce(
+                    Vector3.up * 500f,
+                    ForceMode.Impulse
+                );
+            } else if (LVaultPossible) {
+                Player.AddForce(
+                    Vector3.up * 1.25f,
+                    ForceMode.Impulse
+                );
+            }
+        }
 
-        // Debug.Log(
-        //     "BadVault: " + BadVaultPossible + ", LVault: " + LVaultPossible + ", HVault: " + HVaultPossible + ", WKEY: " + IsForward
-        // );
+        Debug.Log(
+            "BadVault: " + BadVaultPossible + ", LVault: " + LVaultPossible + ", HVault: " + HVaultPossible + ", WKEY: " + IsForward
+        );
+        */
+
 
         float totalSpeed = 1f;
-
         if (IsWalking) {
             totalSpeed *= WalkMultiplier;
         }
@@ -187,8 +209,10 @@ public class MovementController : MonoBehaviour
         }
 
         Player.velocity = new Vector3(HorizontalInput.x*totalSpeed, Player.velocity.y, HorizontalInput.z*totalSpeed);
+        bool[] BooleanValues = {IsCrouching, IsWalking, IsSprinting};
+        string[] StringValues = {"Crouching", "Walking", "Sprinting"};
 
-        // Debug.Log((IsWalking ? "Walk" : "NoWalk") + " " + (IsSprinting ? "Sprint" : "NoSprint"));
+        LogInfo(BooleanValues, StringValues);
     }
 }
 
