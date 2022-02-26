@@ -94,15 +94,15 @@ public class MovementController : MonoBehaviour
         // If it isn't toggle, then we turn it on when the key is pressed, and then add the 
         // extra clause at the bottom to turn it off when the key is not being pressed
 
-        if (Input.GetKey(KeyCode.LeftShift) && (!IsWalking || OverrideControls)){
+        if (Input.GetKey(KeyCode.LeftShift) && (!IsSprinting || OverrideControls)){
             if (ToggleSprint) {
                 IsWalking = false;
                 IsSprinting = !IsSprinting;
-            } else if ((ToggleSprint) && (!IsWalking || OverrideControls)){
+            } else if (!ToggleSprint && (!IsWalking || OverrideControls)) {
                 IsWalking = false;
                 IsSprinting = true;
             }
-        } else if ((!Input.GetKey(KeyCode.LeftShift) && !ToggleSprint) && (!IsWalking || OverrideControls)) {
+        } else if ((!Input.GetKey(KeyCode.LeftShift))) {
             IsSprinting = false;
         }
 
@@ -114,7 +114,7 @@ public class MovementController : MonoBehaviour
                 IsSprinting = false;
                 IsWalking = true;
             }
-        } else if ((!Input.GetKey(KeyCode.LeftAlt)) {
+        } else if ((!Input.GetKey(KeyCode.LeftAlt))) {
             IsWalking = false;
         }
 
