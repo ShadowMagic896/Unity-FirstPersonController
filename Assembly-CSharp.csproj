@@ -37,9 +37,10 @@
   </PropertyGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\HealthController.cs" />
+     <Compile Include="Assets\Scripts\Player Contoller\CameraController.cs" />
      <Compile Include="Assets\Scripts\ArmorController.cs" />
      <Compile Include="Assets\Scripts\Player Contoller\MovementController.cs" />
-     <Compile Include="Assets\Scripts\Player Contoller\CameraController.cs" />
+     <Compile Include="Assets\Scripts\Player Contoller\SoundController.cs" />
     <Reference Include="UnityEngine">
         <HintPath>R:/2020.3.18f1/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
     </Reference>

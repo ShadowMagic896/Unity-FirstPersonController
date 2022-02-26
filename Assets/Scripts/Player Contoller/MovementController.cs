@@ -11,6 +11,13 @@ public class MovementController : MonoBehaviour
             return -x;
         } return x;
     }
+    private string StrTimesInt(string str, int times) {
+        string end = "";
+        for (int i = 0; i < times; i++) {
+            end += str;
+        }
+        return end;
+    }
 
     private Rigidbody Player;
 
@@ -23,19 +30,23 @@ public class MovementController : MonoBehaviour
     private bool HasDoubleJump;
     private bool IsGrounded;
 
+    // These are multiplicitive with the base movement speed, so crouching reduces speed by 50%, and sprinting
+    // increases speed by twofold. This makes it easier to, say, walk or sprint while crouching
+    private bool IsCrouching;
+    private float CrouchMultiplier = 0.5f;
+
     private bool IsWalking;
-    private float WalkSpeed = 1f;
-
-
-    private Vector3 HorizontalInput;
-    private float MovementSpeed = 2f;
+    private float WalkMultiplier = 0.75f;
     
     private bool IsSprinting;
-    private float SprintSpeed = 4f;
+    private float SprintMultiplier = 2f;
+
+    private Vector3 HorizontalInput;
+    private float MovementSpeed = 5f; // Default speed
 
     private bool ToggleWalk = false; // Whether to toggle or hold keys for walking
     private bool ToggleSprint = false; // Whether to toggle or hold keys for sprinting
-    private bool OverrideControls = false; // Whether keys can override other ones or not (walking / running)
+    private bool OverrideControls = true; // Whether keys can override other ones or not (walking / running)
 
     private float VeloX, VeloY, VeloZ;
 
@@ -45,17 +56,9 @@ public class MovementController : MonoBehaviour
 
 
     [SerializeField] private Transform GroundCheckTransform;
-    [SerializeField] private Transform HigherVaultTransform;
-    [SerializeField] private Transform LowerVaultTransform;
-    [SerializeField] private Transform BadVaultTransform;
-
-    private string StrTimesInt(string str, int times) {
-        string end = "";
-        for (int i = 0; i < times; i++) {
-            end += str;
-        }
-        return end;
-    }
+    // [SerializeField] private Transform HigherVaultTransform;
+    // [SerializeField] private Transform LowerVaultTransform;
+    // [SerializeField] private Transform BadVaultTransform;
 
     void Start()
     {
@@ -82,6 +85,11 @@ public class MovementController : MonoBehaviour
             IsWalking = !IsWalking;
         }
 
+        if (Input.GetKeyDown(KeyCode.LeftControl) && (OverrideControls || !IsSprinting)){
+            IsSprinting = false;
+            IsWalking = !IsWalking;
+        }
+
         HorizontalInput = transform.right * Input.GetAxis("Horizontal") * MovementSpeed + transform.forward * Input.GetAxis("Vertical") * MovementSpeed;
 
 
@@ -90,12 +98,12 @@ public class MovementController : MonoBehaviour
     void FixedUpdate()
     {
 
-        // These test if a sphere placed where the test spheres are touch anything other than the player (ground, wall, etc)
+        // These test if a sphere placed where the test spheres are touch anything other than the Player (ground, wall, etc)
         IsGrounded = Physics.OverlapSphere(GroundCheckTransform.position, 0.75f).Length > 1;
 
-        LVaultPossible = Physics.OverlapSphere(LowerVaultTransform.position, 0.5f).Length > 1;
-        HVaultPossible = Physics.OverlapSphere(HigherVaultTransform.position, 0.5f).Length > 1;
-        BadVaultPossible = Physics.OverlapSphere(BadVaultTransform.position, 1f).Length > 1;
+        // LVaultPossible = Physics.OverlapSphere(LowerVaultTransform.position, 0.5f).Length > 1;
+        // HVaultPossible = Physics.OverlapSphere(HigherVaultTransform.position, 0.5f).Length > 1;
+        // BadVaultPossible = Physics.OverlapSphere(BadVaultTransform.position, 1f).Length > 1;
 
 
 
@@ -124,34 +132,41 @@ public class MovementController : MonoBehaviour
                 );
             }
         }
-        if (!BadVaultPossible && Input.GetKeyDown(KeyCode.W)){
-            if (HVaultPossible){
-                Player.AddForce(
-                    Vector3.up * 500f,
-                    ForceMode.Impulse
-                );
-            } else if (LVaultPossible) {
-                Player.AddForce(
-                    Vector3.up * 1.25f,
-                    ForceMode.Impulse
-                );
-            }
-        }
+        // if (!BadVaultPossible && Input.GetKeyDown(KeyCode.W)){
+        //     if (HVaultPossible){
+        //         Player.AddForce(
+        //             Vector3.up * 500f,
+        //             ForceMode.Impulse
+        //         );
+        //     } else if (LVaultPossible) {
+        //         Player.AddForce(
+        //             Vector3.up * 1.25f,
+        //             ForceMode.Impulse
+        //         );
+        //     }
+        // }
+
         // Debug.Log(
         //     "BadVault: " + BadVaultPossible + ", LVault: " + LVaultPossible + ", HVault: " + HVaultPossible + ", WKEY: " + IsForward
         // );
-            
+
+        float totalSpeed = 1f;
+
+        if (IsWalking) {
+            totalSpeed *= WalkMultiplier;
+        }
         if (IsSprinting) {
-            Player.velocity = new Vector3(HorizontalInput.x*SprintSpeed, Player.velocity.y, HorizontalInput.z*SprintSpeed);
+            totalSpeed *= SprintMultiplier;
+        }
+        // Note: Walking and sprinting cannot happen simultaneously
+
+        if (IsCrouching) {
+            totalSpeed *= CrouchMultiplier;
         }
 
-        else if (IsWalking) {
-            Player.velocity = new Vector3(HorizontalInput.x*WalkSpeed, Player.velocity.y, HorizontalInput.z*WalkSpeed);
-        }
+        Player.velocity = new Vector3(HorizontalInput.x*totalSpeed, Player.velocity.y, HorizontalInput.z*totalSpeed);
 
-        else {
-            Player.velocity = new Vector3(HorizontalInput.x*MovementSpeed, Player.velocity.y, HorizontalInput.z*MovementSpeed);
-        }
-        Debug.Log((IsWalking ? "Walk" : "NoWalk") + " " + (IsSprinting ? "Sprint" : "NoSprint"));
+        // Debug.Log((IsWalking ? "Walk" : "NoWalk") + " " + (IsSprinting ? "Sprint" : "NoSprint"));
     }
 }
+

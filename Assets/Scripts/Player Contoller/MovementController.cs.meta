@@ -3,7 +3,11 @@ guid: 6adeb578ff4526f438e12a85bf00e15b
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - GroundCheckTransform: {instanceID: 0}
+  - HigherVaultTransform: {instanceID: 0}
+  - LowerVaultTransform: {instanceID: 0}
+  - BadVaultTransform: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
