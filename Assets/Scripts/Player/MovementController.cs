@@ -6,35 +6,22 @@ using UnityEngine;
 
 public class MovementController : MonoBehaviour
 {
-    private Rigidbody Player;
-    private Camera Camera;
+    [SerializeField] private Rigidbody Player;
 
     private bool IsJumping;
     private float JumpForce = 7f;
 
     private bool IsForward;
 
-    private bool IsDisablingGrav;
-    private float GravDisableRegenPerSec = 20f; // Regeneration per second when grounded
-    private float GravDisableDrainPerSec = 20f; // Drain per second when being used
-    private float GravDisableRegenBuffer = 1.5f; // Time delay between landing and regenerating percentage
-
-    private float GravDisableForce = 0.60f; // How much of gravity to disable (0 = none, 1 = all of it)
-    public float GravDisablePerMax = 100f; // Maximum percent of mass to remove
-
-    public float GravDisablePer = 100f;
-    private bool IsGrounded;
-    private float TimeOnGround = 0f;
-
     // These are multiplicitive with the base movement speed, so crouching reduces speed by 50%, and sprinting
     // increases speed by twofold. This makes it easier to, say, walk or sprint while crouching
-    public bool IsCrouching;
+    private bool IsCrouching;
     private float CrouchMultiplier = 0.5f;
 
-    public bool IsWalking;
+    private bool IsWalking;
     private float WalkMultiplier = 0.75f;
     
-    public bool IsSprinting;
+    private bool IsSprinting;
     private float SprintMultiplier = 2f;
 
     private Vector3 HorizontalInput;
@@ -43,7 +30,6 @@ public class MovementController : MonoBehaviour
     private bool ToggleCrouch = false; // Whether to toggle or hold keys for x
     private bool ToggleWalk = false;
     private bool ToggleSprint = false;
-    private bool ToggleGravDisable = false;
     private bool OverrideControls = true; // Whether keys can override other ones or not (walking / running)
 
     private float VeloX, VeloY, VeloZ;
@@ -52,8 +38,12 @@ public class MovementController : MonoBehaviour
     private bool HVaultPossible;
     private bool BadVaultPossible;
 
+    [HideInInspector] public static bool IsGrounded;
+
     private bool Restarting;
     private bool DebugActive;
+
+    [SerializeField] private PowerTextController powerController;
 
     public static int DisplayControlScheme = 2;
 
@@ -68,13 +58,6 @@ public class MovementController : MonoBehaviour
             return -x;
         } return x;
     }
-    private string StrTimesInt(string str, int times) {
-        string end = "";
-        for (int i = 0; i < times; i++) {
-            end += str;
-        }
-        return end;
-    }
     private void LogInfo(bool[] items, string[] names) {
         string end = "";
         for (int i = 0; i < items.Length; i++) {
@@ -86,7 +69,6 @@ public class MovementController : MonoBehaviour
 
     void Start()
     {
-        Player = GetComponent<Rigidbody>();
         Cursor.lockState = CursorLockMode.Locked;
 		Cursor.visible = false;
     }
@@ -142,20 +124,6 @@ public class MovementController : MonoBehaviour
         }
 
 
-        // GRAVITY
-        if (Input.GetKey(KeyCode.F)){
-            if (GravDisablePer <= 0.1f) {
-                IsDisablingGrav = false;
-            }
-            else if (ToggleGravDisable) {
-                IsDisablingGrav = !ToggleGravDisable;
-            } else {
-                IsDisablingGrav = true;
-            }
-        } else if ((!Input.GetKey(KeyCode.F)) && !ToggleGravDisable) {
-            IsDisablingGrav = false;
-        }
-
 
         //RESTARTING
         if (Input.GetKey(KeyCode.F2)) {
@@ -179,43 +147,12 @@ public class MovementController : MonoBehaviour
         // These test if a sphere placed where the test spheres are touch anything other than the Player (ground, wall, etc)
         IsGrounded = Physics.OverlapSphere(GroundCheckTransform.position, 0.25f).Length > 1;
 
-        
-        // GRAVITY CALCULATIONS (Regen, drain, changing gravity, etc)
-        if (IsGrounded) {
-            TimeOnGround += Time.deltaTime;
-
-            if (TimeOnGround > GravDisableRegenBuffer && GravDisablePer < GravDisablePerMax && !IsDisablingGrav) {
-                GravDisablePer += GravDisableRegenPerSec * (Time.deltaTime); // 20% / second
-            }
-            if (GravDisablePer > GravDisablePerMax) {
-                GravDisablePer = GravDisablePerMax;
-            }
-        } else {
-            TimeOnGround = 0f;
-        }
-
-        if (IsDisablingGrav) {
-            Physics.gravity = new Vector3(0f, -GravDisableForce, 0f);
-            GravDisablePer -= Time.deltaTime * GravDisableDrainPerSec;
-
-            if (GravDisablePer <= 0.1f) {
-                Debug.Log("Is low" + IsDisablingGrav.ToString());
-                IsDisablingGrav = false;
-            }
-
-        } else {
-            Physics.gravity = new Vector3(0f, -9.81f, 0f);
-        }
-
-
         if (IsJumping) {
             if (IsGrounded) {
                 Player.AddForce(Vector3.up*JumpForce, ForceMode.Impulse);
                 IsJumping = false;
             }
         }
-
-        
 
 
         float totalSpeed = 1f; //  Must be declared here to reset it back to 1 every frame, otherwise you will become VERY fast
