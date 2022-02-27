@@ -3,7 +3,10 @@ guid: 72e3226bcbc5f0d48b0128b9cd319e37
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - PlayerCamera: {instanceID: 0}
+  - Player: {instanceID: 0}
+  - Canvas: {fileID: 2154715945147740920, guid: 9708c3b886ec6674b96dcf925015e6bc, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

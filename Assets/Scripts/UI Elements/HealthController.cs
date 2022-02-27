@@ -17,13 +17,13 @@ public class HealthController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        ShownHealth.text = " HEALTH: " + Health;
-
         if (Input.GetKeyDown(KeyCode.T)){
             Health--;
         }
         if (Input.GetKeyDown(KeyCode.Y)){
             Health++;
         }
+
+        ShownHealth.text = " HEALTH: " + Health;
     }
 }

@@ -17,7 +17,6 @@ public class ArmorController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        ShownArmor.text = " ARMOR: " + Armor;
 
         if (Input.GetKeyDown(KeyCode.G)){
             Armor--;
@@ -25,5 +24,7 @@ public class ArmorController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.H)){
             Armor++;
         }
+
+        ShownArmor.text = " ARMOR: " + Armor;
     }
 }

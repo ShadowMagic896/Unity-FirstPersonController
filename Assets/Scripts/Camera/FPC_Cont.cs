@@ -13,9 +13,7 @@ public class FPC_Cont : MonoBehaviour
     [SerializeField] private Camera PlayerCamera;
     [SerializeField] private Rigidbody Player;
 
-    void Start()
-    {
-
+    void Start() {
     }
 
     // Update is called once per frame

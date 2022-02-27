@@ -14,9 +14,17 @@ public class MovementController : MonoBehaviour
 
     private bool IsForward;
 
-    private float DoubleJumpForce = 2f;
-    private bool HasDoubleJump;
+    private bool IsDisablingGrav;
+    private float GravDisableRegenPerSec = 20f; // Regeneration per second when grounded
+    private float GravDisableDrainPerSec = 20f; // Drain per second when being used
+    private float GravDisableRegenBuffer = 1.5f; // Time delay between landing and regenerating percentage
+
+    private float GravDisableForce = 0.60f; // How much of gravity to disable (0 = none, 1 = all of it)
+    public float GravDisablePerMax = 100f; // Maximum percent of mass to remove
+
+    public float GravDisablePer = 100f;
     private bool IsGrounded;
+    private float TimeOnGround = 0f;
 
     // These are multiplicitive with the base movement speed, so crouching reduces speed by 50%, and sprinting
     // increases speed by twofold. This makes it easier to, say, walk or sprint while crouching
@@ -32,9 +40,10 @@ public class MovementController : MonoBehaviour
     private Vector3 HorizontalInput;
     private float MovementSpeed = 5f; // Default speed
 
-    private bool ToggleCrouch = false; // Whether to toggle or hold keys for crouching
-    private bool ToggleWalk = false; // Whether to toggle or hold keys for walking
-    private bool ToggleSprint = false; // Whether to toggle or hold keys for sprinting
+    private bool ToggleCrouch = false; // Whether to toggle or hold keys for x
+    private bool ToggleWalk = false;
+    private bool ToggleSprint = false;
+    private bool ToggleGravDisable = false;
     private bool OverrideControls = true; // Whether keys can override other ones or not (walking / running)
 
     private float VeloX, VeloY, VeloZ;
@@ -46,7 +55,7 @@ public class MovementController : MonoBehaviour
     private bool Restarting;
     private bool DebugActive;
 
-    public static int DisplayControlScheme = 2; // 1 is First Person, 2 is Third Person
+    public static int DisplayControlScheme = 2;
 
 
     [SerializeField] private Transform GroundCheckTransform;
@@ -83,22 +92,17 @@ public class MovementController : MonoBehaviour
     }
 
 
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space)){
-            IsJumping=true;
+    void Update() {
+
+        // JUMPING
+        if (Input.GetKey(KeyCode.Space)){
+            IsJumping = true;
+        } else {
+            IsJumping = false;
         }
-        IsForward = Input.GetKey(KeyCode.W);
-        
-        // Key is pressed, and either we are not walking or we override the walking
 
-        // Seperate actions for whether toggle or hold.
 
-        // If it's toggle, we turn off walking and toggle the sprinting.
-
-        // If it isn't toggle, then we turn it on when the key is pressed, and then add the 
-        // extra clause at the bottom to turn it off when the key is not being pressed
-
+        // SPRINTING
         if (Input.GetKey(KeyCode.LeftShift) && (!IsSprinting || OverrideControls)){
             if (ToggleSprint) {
                 IsWalking = false;
@@ -107,10 +111,12 @@ public class MovementController : MonoBehaviour
                 IsWalking = false;
                 IsSprinting = true;
             }
-        } else if ((!Input.GetKey(KeyCode.LeftShift))) {
+        } else if ((!Input.GetKey(KeyCode.LeftShift)) && !ToggleSprint) {
             IsSprinting = false;
         }
 
+
+        // WALKING
         if (Input.GetKey(KeyCode.LeftAlt) && (!IsWalking || OverrideControls)){
             if (ToggleWalk) {
                 IsSprinting = false;
@@ -119,10 +125,12 @@ public class MovementController : MonoBehaviour
                 IsSprinting = false;
                 IsWalking = true;
             }
-        } else if ((!Input.GetKey(KeyCode.LeftAlt))) {
+        } else if ((!Input.GetKey(KeyCode.LeftAlt)) && !ToggleWalk) {
             IsWalking = false;
         }
+        
 
+        // CROUCHING
         if (Input.GetKey(KeyCode.LeftControl)){
             if (ToggleCrouch) {
                 IsCrouching = !IsCrouching;
@@ -133,81 +141,84 @@ public class MovementController : MonoBehaviour
             IsCrouching = false;
         }
 
-        if (Input.GetKey(KeyCode.R)) {
+
+        // GRAVITY
+        if (Input.GetKey(KeyCode.F)){
+            if (GravDisablePer <= 0.1f) {
+                IsDisablingGrav = false;
+            }
+            else if (ToggleGravDisable) {
+                IsDisablingGrav = !ToggleGravDisable;
+            } else {
+                IsDisablingGrav = true;
+            }
+        } else if ((!Input.GetKey(KeyCode.F)) && !ToggleGravDisable) {
+            IsDisablingGrav = false;
+        }
+
+
+        //RESTARTING
+        if (Input.GetKey(KeyCode.F2)) {
             Restarting = true;
         }
-        if (Input.GetKey(KeyCode.F)) {
+
+
+        //DEBUGGING
+        if (Input.GetKey(KeyCode.F1)) {
             DebugActive = true;
         } else {
             DebugActive = false;
         }
+
+
         HorizontalInput = transform.right * Input.GetAxis("Horizontal") * MovementSpeed + transform.forward * Input.GetAxis("Vertical") * MovementSpeed;
-
-
     }
 
-    void FixedUpdate()
-    {
+    void FixedUpdate() {
 
         // These test if a sphere placed where the test spheres are touch anything other than the Player (ground, wall, etc)
         IsGrounded = Physics.OverlapSphere(GroundCheckTransform.position, 0.25f).Length > 1;
 
-        /*
-        Unused ATM
+        
+        // GRAVITY CALCULATIONS (Regen, drain, changing gravity, etc)
+        if (IsGrounded) {
+            TimeOnGround += Time.deltaTime;
 
-        LVaultPossible = Physics.OverlapSphere(LowerVaultTransform.position, 0.5f).Length > 1;
-        HVaultPossible = Physics.OverlapSphere(HigherVaultTransform.position, 0.5f).Length > 1;
-        BadVaultPossible = Physics.OverlapSphere(BadVaultTransform.position, 1f).Length > 1;
-        */
+            if (TimeOnGround > GravDisableRegenBuffer && GravDisablePer < GravDisablePerMax && !IsDisablingGrav) {
+                GravDisablePer += GravDisableRegenPerSec * (Time.deltaTime); // 20% / second
+            }
+            if (GravDisablePer > GravDisablePerMax) {
+                GravDisablePer = GravDisablePerMax;
+            }
+        } else {
+            TimeOnGround = 0f;
+        }
+
+        if (IsDisablingGrav) {
+            Physics.gravity = new Vector3(0f, -GravDisableForce, 0f);
+            GravDisablePer -= Time.deltaTime * GravDisableDrainPerSec;
+
+            if (GravDisablePer <= 0.1f) {
+                Debug.Log("Is low" + IsDisablingGrav.ToString());
+                IsDisablingGrav = false;
+            }
+
+        } else {
+            Physics.gravity = new Vector3(0f, -9.81f, 0f);
+        }
 
 
         if (IsJumping) {
             if (IsGrounded) {
                 Player.AddForce(Vector3.up*JumpForce, ForceMode.Impulse);
                 IsJumping = false;
-                HasDoubleJump = true;
-            } 
-
-            else if (HasDoubleJump) {
-                Player.AddForce(Vector3.up*DoubleJumpForce, ForceMode.Impulse);
-                IsJumping = false;
-                HasDoubleJump = false;
-
-                
-                VeloX = Player.velocity.x; // Side to side
-                VeloY = Player.velocity.y; // Up and down
-                VeloZ = Player.velocity.z; // Front to back
-
-                Player.AddForce(
-                    VeloX * 2f, 
-                    7f, 
-                    VeloZ * 2f, 
-                    ForceMode.Impulse
-                );
-            }
-        }
-        /*
-        if (!BadVaultPossible && Input.GetKeyDown(KeyCode.W)){
-            if (HVaultPossible){
-                Player.AddForce(
-                    Vector3.up * 500f,
-                    ForceMode.Impulse
-                );
-            } else if (LVaultPossible) {
-                Player.AddForce(
-                    Vector3.up * 1.25f,
-                    ForceMode.Impulse
-                );
             }
         }
 
-        Debug.Log(
-            "BadVault: " + BadVaultPossible + ", LVault: " + LVaultPossible + ", HVault: " + HVaultPossible + ", WKEY: " + IsForward
-        );
-        */
+        
 
 
-        float totalSpeed = 1f;
+        float totalSpeed = 1f; //  Must be declared here to reset it back to 1 every frame, otherwise you will become VERY fast
         if (IsWalking) {
             totalSpeed *= WalkMultiplier;
         }
@@ -231,7 +242,8 @@ public class MovementController : MonoBehaviour
 
         if (Restarting) {
             Restarting = false;
-            Player.position = Vector3.zero;
+            Player.position = new Vector3(0f, 3f, 0f);
+            Player.velocity = Vector3.zero;
         }
     }
 }
