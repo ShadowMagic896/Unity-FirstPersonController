@@ -18,7 +18,7 @@ public class GravController : MonoBehaviour
     private float TimeOnGround = 0f;
     private float TimeNotGrav = 0f;
     
-    private bool ToggleGravDisable = false;
+    private bool ToggleGravDisable = true;
 
     private MovementController movementController;
     [SerializeField] private PowerTextController powerController;
@@ -32,14 +32,14 @@ public class GravController : MonoBehaviour
     void Update()
     {
 
-        if (Input.GetKey(KeyCode.F)){
+        if (Input.GetKeyDown(KeyCode.F)){
 
             if (GravDisablePercent <= 0.1f) {
                 IsDisablingGrav = false;
             }
 
             else if (ToggleGravDisable) {
-                IsDisablingGrav = !ToggleGravDisable;
+                IsDisablingGrav = !IsDisablingGrav;
             } 
 
             else {

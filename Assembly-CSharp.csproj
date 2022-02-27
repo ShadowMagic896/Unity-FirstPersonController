@@ -36,14 +36,16 @@
     <ImplicitlyExpandDesignTimeFacades>false</ImplicitlyExpandDesignTimeFacades>
   </PropertyGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\Player\GravController.cs" />
      <Compile Include="Assets\Scripts\UI Elements\HealthTextController.cs" />
      <Compile Include="Assets\Scripts\Camera\FPC_Cont.cs" />
      <Compile Include="Assets\Scripts\Player\SoundController.cs" />
      <Compile Include="Assets\Scripts\UI Elements\ArmorTextController.cs" />
-     <Compile Include="Assets\Scripts\Player\MovementController.cs" />
      <Compile Include="Assets\Scripts\Camera\TPC_Cont.cs" />
+     <Compile Include="Assets\Scripts\Player\MovementController.cs" />
      <Compile Include="Assets\Scripts\UI Elements\PowerTextController.cs" />
-     <Compile Include="Assets\Scripts\Player\GravController.cs" />
+     <Compile Include="Assets\Scripts\Camera\TPC_FOV_Controller.cs" />
+     <Compile Include="Assets\Scripts\Camera\FPC_POV_Controller.cs" />
     <Reference Include="UnityEngine">
         <HintPath>R:\2020.3.30f1\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>
     </Reference>

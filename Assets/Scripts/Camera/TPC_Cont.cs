@@ -13,11 +13,11 @@ public class TPC_Cont : MonoBehaviour {
     [SerializeField] private Rigidbody Player;
 
     void Start() {
-
+        
     }
-
-    // Update is called once per frame
+    
     void Update() {
+
         if (MovementController.DisplayControlScheme == 2) {
             float XIn = Input.GetAxis("Mouse X");
             float YIn = Input.GetAxis("Mouse Y");
