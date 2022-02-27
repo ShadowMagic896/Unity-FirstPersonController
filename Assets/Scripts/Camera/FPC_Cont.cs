@@ -14,7 +14,6 @@ public class FPC_Cont : MonoBehaviour
     [SerializeField] private Rigidbody Player;
 
     void Start() {
-        
     }
 
     // Update is called once per frame

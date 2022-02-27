@@ -18,7 +18,7 @@ public class GravController : MonoBehaviour
     private float TimeOnGround = 0f;
     private float TimeNotGrav = 0f;
     
-    private bool ToggleGravDisable = true;
+    [SerializeField] private bool ToggleGravDisable = true;
 
     private MovementController movementController;
     [SerializeField] private PowerTextController powerController;

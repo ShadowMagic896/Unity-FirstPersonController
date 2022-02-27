@@ -16,16 +16,16 @@ public class MovementController : MonoBehaviour
     // These are multiplicitive with the base movement speed, so crouching reduces speed by 50%, and sprinting
     // increases speed by twofold. This makes it easier to, say, walk or sprint while crouching
     private bool IsCrouching;
-    private float CrouchMultiplier = 0.5f;
+     float CrouchMultiplier = 0.5f;
 
     private bool IsWalking;
-    private float WalkMultiplier = 0.75f;
+    [SerializeField, Range(0, 10)] private float WalkMultiplier = 0.75f;
     
     private bool IsSprinting;
-    private float SprintMultiplier = 2f;
+    [SerializeField, Range(0, 10)] private float SprintMultiplier = 2f;
 
     private Vector3 HorizontalInput;
-    private float MovementSpeed = 5f; // Default speed
+    [SerializeField, Range(0, 10)] private float MovementSpeed = 5f; // Default speed
 
     private bool ToggleCrouch = false; // Whether to toggle or hold keys for x
     private bool ToggleWalk = false;
