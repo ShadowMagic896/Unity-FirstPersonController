@@ -19,13 +19,13 @@ public class MovementController : MonoBehaviour
      float CrouchMultiplier = 0.5f;
 
     private bool IsWalking;
-    [SerializeField, Range(0, 10)] private float WalkMultiplier = 0.75f;
+    [SerializeField, Range(0f, 10f)] private float WalkMultiplier = 0.75f;
     
     private bool IsSprinting;
-    [SerializeField, Range(0, 10)] private float SprintMultiplier = 2f;
+    [SerializeField, Range(0f, 10f)] private float SprintMultiplier = 2f;
 
     private Vector3 HorizontalInput;
-    [SerializeField, Range(0, 10)] private float MovementSpeed = 5f; // Default speed
+    [SerializeField, Range(0f, 10f)] private float MovementSpeed = 5f; // Default speed
 
     private bool ToggleCrouch = false; // Whether to toggle or hold keys for x
     private bool ToggleWalk = false;
@@ -71,6 +71,8 @@ public class MovementController : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.Locked;
 		Cursor.visible = false;
+
+        RenderSettings.ambientLight = Color.white;
     }
 
 

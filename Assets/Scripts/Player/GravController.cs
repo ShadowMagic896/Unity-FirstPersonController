@@ -6,19 +6,19 @@ public class GravController : MonoBehaviour
 {
 
     private bool IsDisablingGrav;
-    private float GravDisableRegenPercentSec = 20f; // Regeneration per second when grounded
-    private float GravDisableDrainPercentSec = 20f; // Drain per second when being used
-    private float GravDisableRegenBuffer = 1.5f; // Time delay between landing and regenerating percentage
+    [SerializeField, Range(0f, 100f)] private float GDRegenPercentSec = 20f; // Regeneration per second when grounded
+    [SerializeField, Range(0f, 100f)] private float GDDrainPercentSec = 20f; // Drain per second when being used
+    [SerializeField, Range(0f, 10f)] private float GDRegenBuffer = 1.5f; // Time delay between landing and regenerating percentage
 
-    private float GravDisableForce = 1f; // How much of gravity to disable (0 = none, 1 = all of it)
-    private float GravDisablePercentMax = 100f; // Maximum percent of mass to remove
+    [SerializeField, Range(0f, 2f)] private float GDForce = 1f; // How much of gravity to disable (0 = none, 1 = all of it)
+    [SerializeField, Range(0f, 1000f)] private float GDEnergyLevelMax = 100f; // Maximum percent energy
 
-    private float GravDisablePercent = 100f;
+    private float GDEnergyLevel = 100f; // Starting percentage
     private bool IsGrounded;
     private float TimeOnGround = 0f;
     private float TimeNotGrav = 0f;
     
-    [SerializeField] private bool ToggleGravDisable = true;
+    [SerializeField] private bool ToggleGD = false;
 
     private MovementController movementController;
     [SerializeField] private PowerTextController powerController;
@@ -34,11 +34,11 @@ public class GravController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.F)){
 
-            if (GravDisablePercent <= 0.1f) {
+            if (GDEnergyLevel <= 0.1f) {
                 IsDisablingGrav = false;
             }
 
-            else if (ToggleGravDisable) {
+            else if (ToggleGD) {
                 IsDisablingGrav = !IsDisablingGrav;
             } 
 
@@ -49,13 +49,13 @@ public class GravController : MonoBehaviour
             TimeNotGrav = 0f;
 
         } else {
-            if ((!Input.GetKey(KeyCode.F)) && !ToggleGravDisable) {
+            if ((!Input.GetKey(KeyCode.F)) && !ToggleGD) {
                 IsDisablingGrav = false;
             }
             TimeNotGrav += Time.deltaTime;
         }
 
-        powerController.SetEnergy(Mathf.RoundToInt(GravDisablePercent));
+        powerController.SetEnergy(Mathf.RoundToInt(GDEnergyLevel));
     }
 
     void FixedUpdate() {
@@ -65,21 +65,21 @@ public class GravController : MonoBehaviour
         if (IsGrounded) {
             TimeOnGround += Time.deltaTime;
 
-            if ((TimeNotGrav > GravDisableRegenBuffer) && GravDisablePercent < GravDisablePercentMax && !IsDisablingGrav) {
-                GravDisablePercent += GravDisableRegenPercentSec * (Time.deltaTime); // 20% / second
+            if ((TimeNotGrav > GDRegenBuffer) && GDEnergyLevel < GDEnergyLevelMax && !IsDisablingGrav) {
+                GDEnergyLevel += GDRegenPercentSec * (Time.deltaTime); // 20% / second
             }
-            if (GravDisablePercent > GravDisablePercentMax) {
-                GravDisablePercent = GravDisablePercentMax;
+            if (GDEnergyLevel > GDEnergyLevelMax) {
+                GDEnergyLevel = GDEnergyLevelMax;
             }
         } else {
             TimeOnGround = 0f;
         }
 
         if (IsDisablingGrav) {
-            Physics.gravity = new Vector3(0f, GravDisableForce / -9.81f, 0f);
-            GravDisablePercent -= Time.deltaTime * GravDisableDrainPercentSec;
+            Physics.gravity = new Vector3(0f, -9.81f * (1 - GDForce), 0f);
+            GDEnergyLevel -= Time.deltaTime * GDDrainPercentSec;
 
-            if (GravDisablePercent <= 0.1f) {
+            if (GDEnergyLevel <= 0.1f) {
                 IsDisablingGrav = false;
             }
 
