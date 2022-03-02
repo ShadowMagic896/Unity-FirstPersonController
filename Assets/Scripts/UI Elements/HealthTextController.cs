@@ -6,9 +6,10 @@ using UnityEngine.UI;
 public class HealthTextController : MonoBehaviour
 {
     [SerializeField] private Text ShownHealth;
+    [SerializeField] private int StartingHealth;
 
     void Start() {
-        SetHealth(100);
+        SetHealth(StartingHealth);
     }
 
     public void SetHealth(int Health) {
