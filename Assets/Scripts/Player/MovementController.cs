@@ -53,26 +53,12 @@ public class MovementController : MonoBehaviour
     // [SerializeField] private Transform LowerVaultTransform;
     // [SerializeField] private Transform BadVaultTransform;
 
-    public static float Abs(float x){
-        if (x < 0){
-            return -x;
-        } return x;
-    }
-    private void LogInfo(bool[] items, string[] names) {
-        string end = "";
-        for (int i = 0; i < items.Length; i++) {
-            end += (items[i] ? names[i] : "Not-" + names[i]) + ", ";
-        }
-        Debug.Log(end);
-    }
-
+    
 
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
 		Cursor.visible = false;
-
-        RenderSettings.ambientLight = Color.white;
     }
 
 

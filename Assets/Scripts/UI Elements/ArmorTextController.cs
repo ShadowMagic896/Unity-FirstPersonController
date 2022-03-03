@@ -6,9 +6,10 @@ using UnityEngine.UI;
 public class ArmorTextController : MonoBehaviour
 {
     [SerializeField] private Text ShownArmor;
+    [SerializeField] private int StartingArmor;
 
     void Start() {
-        SetArmor(100);
+        SetArmor(StartingArmor);
     }
 
     public void SetArmor(int Armor) {

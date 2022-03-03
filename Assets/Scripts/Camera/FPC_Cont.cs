@@ -2,8 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FPC_Cont : MonoBehaviour
-{
+public class FPC_Cont : MonoBehaviour {
     private float VerticalSensitivity = 2f;
     private float HorizontalSensitivity = 2f;
 
@@ -14,9 +13,9 @@ public class FPC_Cont : MonoBehaviour
     [SerializeField] private Rigidbody Player;
 
     void Start() {
+        
     }
 
-    // Update is called once per frame
     void Update() {
         
 
